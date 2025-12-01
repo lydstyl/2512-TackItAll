@@ -1,0 +1,69 @@
+// Prisma schema for TackItAll application
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String
+  password  String    // Hashed password with bcrypt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  trackers  Tracker[]
+
+  @@map("users")
+}
+
+model Tracker {
+  id          String      @id @default(cuid())
+  userId      String
+  name        String
+  type        TrackerType
+  description String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries     Entry[]
+
+  @@index([userId])
+  @@index([userId, createdAt])
+  @@map("trackers")
+}
+
+model Entry {
+  id          String   @id @default(cuid())
+  trackerId   String
+
+  // Polymorphic value storage - store all types in appropriate columns
+  // Only one of these fields will be non-null based on the tracker type
+  boolValue   Boolean?  // For BOOLEAN type
+  numValue    Float?    // For NUMBER type
+  textValue   String?   // For TEXT type
+  intValue    Int?      // For DURATION (minutes) and CURRENCY (cents)
+
+  note        String?
+  recordedAt  DateTime  // When the tracked event occurred
+  createdAt   DateTime  @default(now())
+
+  tracker     Tracker   @relation(fields: [trackerId], references: [id], onDelete: Cascade)
+
+  @@index([trackerId])
+  @@index([trackerId, recordedAt])
+  @@map("entries")
+}
+
+enum TrackerType {
+  BOOLEAN   // true/false (e.g., "Did I exercise?")
+  NUMBER    // decimal number (e.g., weight, distance)
+  TEXT      // free text (e.g., notes, mood description)
+  DURATION  // HH:MM format, stored as minutes in intValue
+  CURRENCY  // EUR only, stored as cents in intValue
+}

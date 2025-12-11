@@ -18,13 +18,16 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './'),
+      '@': path.resolve(__dirname, './src'),
       '@/domain': path.resolve(__dirname, './src/domain'),
       '@/application': path.resolve(__dirname, './src/application'),
       '@/infrastructure': path.resolve(__dirname, './src/infrastructure'),
       '@/ui': path.resolve(__dirname, './src/ui'),
       '@/shared': path.resolve(__dirname, './src/shared'),
       '@/tests': path.resolve(__dirname, './tests'),
+      '@/components': path.resolve(__dirname, './components'),
+      '@/lib': path.resolve(__dirname, './lib'),
+      '@/auth': path.resolve(__dirname, './auth'),
     },
   },
 });

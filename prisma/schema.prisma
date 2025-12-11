@@ -1,4 +1,4 @@
-// Prisma schema for TackItAll application
+// Prisma schema for TrackItAll application
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,14 +9,14 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
+  id        String   @id @default(cuid())
+  email     String   @unique
   name      String
-  password  String    // Hashed password with bcrypt
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  password  String // Hashed password with bcrypt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  trackers  Tracker[]
+  trackers Tracker[]
 
   @@map("users")
 }
@@ -30,8 +30,8 @@ model Tracker {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  entries     Entry[]
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries Entry[]
 
   @@index([userId])
   @@index([userId, createdAt])
@@ -39,21 +39,21 @@ model Tracker {
 }
 
 model Entry {
-  id          String   @id @default(cuid())
-  trackerId   String
+  id        String @id @default(cuid())
+  trackerId String
 
   // Polymorphic value storage - store all types in appropriate columns
   // Only one of these fields will be non-null based on the tracker type
-  boolValue   Boolean?  // For BOOLEAN type
-  numValue    Float?    // For NUMBER type
-  textValue   String?   // For TEXT type
-  intValue    Int?      // For DURATION (minutes) and CURRENCY (cents)
+  boolValue Boolean? // For BOOLEAN type
+  numValue  Float? // For NUMBER type
+  textValue String? // For TEXT type
+  intValue  Int? // For DURATION (minutes) and CURRENCY (cents)
 
-  note        String?
-  recordedAt  DateTime  // When the tracked event occurred
-  createdAt   DateTime  @default(now())
+  note       String?
+  recordedAt DateTime // When the tracked event occurred
+  createdAt  DateTime @default(now())
 
-  tracker     Tracker   @relation(fields: [trackerId], references: [id], onDelete: Cascade)
+  tracker Tracker @relation(fields: [trackerId], references: [id], onDelete: Cascade)
 
   @@index([trackerId])
   @@index([trackerId, recordedAt])
@@ -61,9 +61,9 @@ model Entry {
 }
 
 enum TrackerType {
-  BOOLEAN   // true/false (e.g., "Did I exercise?")
-  NUMBER    // decimal number (e.g., weight, distance)
-  TEXT      // free text (e.g., notes, mood description)
-  DURATION  // HH:MM format, stored as minutes in intValue
-  CURRENCY  // EUR only, stored as cents in intValue
+  BOOLEAN // true/false (e.g., "Did I exercise?")
+  NUMBER // decimal number (e.g., weight, distance)
+  TEXT // free text (e.g., notes, mood description)
+  DURATION // HH:MM format, stored as minutes in intValue
+  CURRENCY // EUR only, stored as cents in intValue
 }

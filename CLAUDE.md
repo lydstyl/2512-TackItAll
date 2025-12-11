@@ -4,13 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-TackItAll is a personal tracking application built with Next.js that allows users to track various aspects of their life (expenses, workouts, sleep, mood, etc.) with customizable trackers and statistics.
+TrackItAll is a personal tracking application built with Next.js that allows users to track various aspects of their life (expenses, workouts, sleep, mood, etc.) with customizable trackers and statistics.
 
 **Tech Stack**: Next.js 16 (App Router), TypeScript, TailwindCSS, shadcn/ui, Prisma + SQLite, NextAuth.js v5, Vitest, Chart.js
 
 ## Development Commands
 
 ### Running the Application
+
 ```bash
 npm run dev          # Start development server (http://localhost:3000)
 npm run build        # Build for production
@@ -19,6 +20,7 @@ npm run lint         # Run ESLint
 ```
 
 ### Testing (TDD Workflow)
+
 ```bash
 npm test                        # Run all tests in watch mode
 npm test -- <filename>          # Run specific test file (e.g., Email.test.ts)
@@ -27,6 +29,7 @@ npm run test:coverage           # Generate coverage report
 ```
 
 ### Database (Prisma)
+
 ```bash
 npx prisma generate             # Generate Prisma Client after schema changes
 npx prisma migrate dev          # Create and apply migrations
@@ -63,6 +66,7 @@ tests/                 # All test files
 ```
 
 **Dependency Rules** (Critical):
+
 - **Domain**: Zero dependencies on other layers (pure TypeScript)
 - **Application**: Depends only on `domain/`
 - **Infrastructure**: Implements `domain/` interfaces
@@ -75,6 +79,7 @@ tests/                 # All test files
 The system supports 5 tracker types, each with different value storage:
 
 **TrackerType Enum**:
+
 - `BOOLEAN`: true/false → displayed as "Yes"/"No"
 - `NUMBER`: decimal numbers
 - `TEXT`: free text
@@ -82,6 +87,7 @@ The system supports 5 tracker types, each with different value storage:
 - `CURRENCY`: EUR only → **stored as cents** (e.g., €15.50 = 1550 cents)
 
 **EntryValue Classes** (`src/domain/valueObjects/EntryValue.ts`):
+
 ```typescript
 // Abstract base class
 abstract class EntryValue {
@@ -113,6 +119,7 @@ model Entry {
 ```
 
 **Why this approach?**:
+
 - Enables SQL aggregations (AVG, SUM, MIN, MAX) for statistics
 - Type-safe with Prisma
 - Indexed queries for performance
@@ -138,20 +145,23 @@ toPrisma(entry): PrismaEntryData {
 ## Testing Strategy
 
 **TDD Workflow** (strictly followed):
+
 1. Write test first (Red)
 2. Implement minimum code (Green)
 3. Refactor if needed (Clean)
 
 **Test Structure**:
+
 - `tests/unit/domain/` - Value objects, entities (42 tests currently passing)
 - `tests/unit/application/` - Use cases with mock repositories
 - `tests/integration/` - API routes with real Prisma
 - `tests/helpers/` - Test utilities
 
 **Important**: Tests use relative imports due to Vitest alias resolution:
+
 ```typescript
 // In tests, use relative paths:
-import { Email } from '../../../../src/domain/valueObjects/Email';
+import { Email } from '../../../../src/domain/valueObjects/Email'
 // NOT: import { Email } from '@/domain/valueObjects/Email';
 ```
 
@@ -187,6 +197,7 @@ import { Email } from '../../../../src/domain/valueObjects/Email';
 ### Statistics Calculation
 
 **Current approach (v1)**: On-the-fly calculation (no caching)
+
 - Simple, always up-to-date
 - Acceptable for <1000 entries/tracker
 - Use SQL aggregations directly on `intValue`, `numValue` columns
@@ -202,15 +213,15 @@ export class CreateTracker {
 
   async execute(dto: CreateTrackerDTO): Promise<CreateTrackerResult> {
     // 1. Validate with domain value objects
-    const name = new TrackerName(dto.name);
+    const name = new TrackerName(dto.name)
 
     // 2. Create domain entity
-    const tracker = new Tracker(/* ... */);
+    const tracker = new Tracker(/* ... */)
 
     // 3. Use repository (interface from domain)
-    await this.trackerRepo.save(tracker);
+    await this.trackerRepo.save(tracker)
 
-    return { success: true, tracker };
+    return { success: true, tracker }
   }
 }
 ```
@@ -221,22 +232,22 @@ export class CreateTracker {
 // app/api/trackers/route.ts
 export async function POST(request: Request) {
   // 1. Check authentication
-  const session = await auth();
-  if (!session) return unauthorized();
+  const session = await auth()
+  if (!session) return unauthorized()
 
   // 2. Parse and validate input
-  const body = await request.json();
+  const body = await request.json()
 
   // 3. Instantiate use case with repository
-  const useCase = new CreateTracker(new PrismaTrackerRepository());
+  const useCase = new CreateTracker(new PrismaTrackerRepository())
 
   // 4. Execute and return
   const result = await useCase.execute({
     userId: session.user.id,
     ...body
-  });
+  })
 
-  return NextResponse.json(result.tracker, { status: 201 });
+  return NextResponse.json(result.tracker, { status: 201 })
 }
 ```
 

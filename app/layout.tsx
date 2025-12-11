@@ -1,21 +1,21 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata } from 'next'
+import './globals.css'
 
 export const metadata: Metadata = {
-  title: "TackItAll - Personal Tracking App",
-  description: "Track anything in your life with customizable trackers",
-};
+  title: 'TrackItAll - Personal Tracking App',
+  description: 'Track anything in your life with customizable trackers'
+}
 
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased" suppressHydrationWarning>
+    <html lang='en'>
+      <body className='antialiased' suppressHydrationWarning>
         {children}
       </body>
     </html>
-  );
+  )
 }

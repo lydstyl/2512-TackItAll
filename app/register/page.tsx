@@ -32,11 +32,6 @@ export default function RegisterPage() {
       return;
     }
 
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters');
-      return;
-    }
-
     setIsLoading(true);
 
     try {
@@ -102,12 +97,11 @@ export default function RegisterPage() {
               <Input
                 id='password'
                 type='password'
-                placeholder='At least 8 characters'
+                placeholder='Choose a password'
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={isLoading}
-                minLength={8}
               />
             </div>
             <div className='space-y-2'>

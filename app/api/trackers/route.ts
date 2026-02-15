@@ -67,6 +67,9 @@ export async function POST(request: Request) {
     }
 
     const tracker = result.tracker!;
+    console.log('[POST /api/trackers] Created tracker with ID:', tracker.id.value);
+    console.log('[POST /api/trackers] User ID:', session.user.id);
+
     return NextResponse.json(
       {
         tracker: {

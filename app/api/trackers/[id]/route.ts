@@ -14,8 +14,16 @@ export async function GET(
     }
 
     const { id } = await params;
+    console.log('[GET /api/trackers/[id]] Looking for tracker with ID:', id);
+    console.log('[GET /api/trackers/[id]] User ID:', session.user.id);
+
     const repository = new PrismaTrackerRepository();
     const tracker = await repository.findById(new TrackerId(id));
+
+    console.log('[GET /api/trackers/[id]] Tracker found:', tracker ? 'YES' : 'NO');
+    if (tracker) {
+      console.log('[GET /api/trackers/[id]] Tracker userId:', tracker.userId.value);
+    }
 
     if (!tracker) {
       return NextResponse.json({ error: 'Tracker not found' }, { status: 404 });

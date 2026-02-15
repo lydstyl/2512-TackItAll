@@ -9,6 +9,9 @@ export class PrismaTrackerRepository implements ITrackerRepository {
   async save(tracker: Tracker): Promise<void> {
     const prismaData = TrackerMapper.toPrisma(tracker);
 
+    console.log('[PrismaTrackerRepository.save] Saving tracker with ID:', tracker.id.value);
+    console.log('[PrismaTrackerRepository.save] Tracker data:', prismaData);
+
     await prisma.tracker.upsert({
       where: { id: tracker.id.value },
       create: {
@@ -22,12 +25,25 @@ export class PrismaTrackerRepository implements ITrackerRepository {
         updatedAt: new Date(),
       },
     });
+
+    console.log('[PrismaTrackerRepository.save] Tracker saved successfully');
   }
 
   async findById(id: TrackerId): Promise<Tracker | null> {
+    console.log('[PrismaTrackerRepository.findById] Looking for tracker with ID:', id.value);
+
     const prismaTracker = await prisma.tracker.findUnique({
       where: { id: id.value },
     });
+
+    console.log('[PrismaTrackerRepository.findById] Tracker found:', prismaTracker ? 'YES' : 'NO');
+    if (prismaTracker) {
+      console.log('[PrismaTrackerRepository.findById] Tracker data:', {
+        id: prismaTracker.id,
+        name: prismaTracker.name,
+        userId: prismaTracker.userId,
+      });
+    }
 
     if (!prismaTracker) {
       return null;
